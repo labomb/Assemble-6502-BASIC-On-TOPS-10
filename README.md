@@ -48,7 +48,7 @@ This repository contains the following:
 Here is what I am using:
 
 ### simh
-You can find later 3.x source and Windows binaries [here](https://github.com/microsoft/BASIC-M6502). There is also the open-simh project and that can be found [here](https://github.com/open-simh/simh), but I still use 3.x.
+You can find later 3.x source and Windows binaries [here](https://github.com/simh/simh). There is also the open-simh project and that can be found [here](https://github.com/open-simh/simh), but I still use 3.x.
 
 It is beyond the scope of this document to detail how to set up the simh PDP-10 environment, but there is plenty of documentation online on how to go about doing so. That said, you will need to ensure that simh is configured with DZ11 terminal emulation support to facilitate the file transfer process. The contents of my simh configuration file (pdp10.cfg) are as follows:
 
