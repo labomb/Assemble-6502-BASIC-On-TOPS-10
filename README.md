@@ -47,7 +47,7 @@ This repository contains the following:
 
 Here is what I am using:
 
-**simh** 
+##### simh
 You can find later 3.x source and Windows binaries [here](https://github.com/microsoft/BASIC-M6502). There is also the open-simh project and that can be found [here](https://github.com/open-simh/simh), but I still use 3.x.
 
 It is beyond the scope of this document to detail how to set up the simh PDP-10 environment, but there is plenty of documentation online on how to go about doing so. That said, you will need to ensure that simh is configured with DZ11 terminal emulation support to facilitate the file transfer process. The contents of my simh configuration file (pdp10.cfg) are as follows:
@@ -63,10 +63,10 @@ att -am dz 2020
 boot rp+
 ```
 
-**TOPS-10**
+##### TOPS-10
 I use the excellent ready-to-go TOPS-10 distribution found [here](https://steubentech.com/~talon/pdp10/). The direct download link is [here](https://steubentech.com/~talon/pdp10/tops10-1.4.tar.bz2). If you are not familiar with TOPS-10, then take some time to read the quick start guide found [here](https://steubentech.com/~talon/pdp10/readme.txt).
 
-**Kermit**
+##### Kermit
 You will need a copy of C-Kermit found [here](https://www.kermitproject.org/) or a terminal emulator that supports Kermit file transfers and telnet. See the KERMIT.md file for notes on configuring and using Kermit to transfer files to/from the simh PDP-10. 
 
 
