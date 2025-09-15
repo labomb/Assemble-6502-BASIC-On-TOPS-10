@@ -1,0 +1,717 @@
+UNIVERSAL M6502L
+SALL
+
+;
+; WRITTEN BY:
+;
+; SCOTT LABOMBARD
+; LABOMB@ROCHESTER.RR.COM
+; 12/19/2013
+;
+
+START:
+
+SYN LOC,ORG
+
+DEFINE DC (Q),<
+	N==^D0
+	IRPC Q,<N==N+1>
+	BB==<N-1>
+	IRPC Q,<
+		BB==<BB-1>
+		IFN "Q",<
+			IFE <BB>,<
+				"Q"+^D128>
+			IFN <BB>,<
+				"Q">>>>
+
+DEFINE ADR (WD),<
+	<WD>&^O377
+	<WD>/^O400>
+
+DEFINE JSR (WD),<
+	^O040
+	<WD>&^O377
+	<WD>/^O400>
+
+DEFINE JMP (WD),<
+	^O114
+	<WD>&^O377
+	<WD>/^O400>
+
+DEFINE JMPD (WD),<
+	^O154
+	<WD>&^O377
+	<WD>/^O400>
+
+DEFINE BIT (Q),<
+	IFLE <<Q>-^O377>,<
+		^O044
+		<Q>>
+	IFG <<Q>-^O377>,<
+		^O054
+		<Q>&^O377
+		<Q>/^O400>>
+
+DEFINE ADC (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O145
+			<A>>
+		IFG <<A>-^O377>,<
+			^O155
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				^O165
+				<A>>
+			IFG <<A>-^O377>,<
+				^O175
+				<A>&^O377
+				<A>/^O400>>
+		IFIDN <B> <Y>,<
+			^O171
+			<A>&^O377
+			<A>/^O400>>>
+
+DEFINE ADCDY (Q),<
+	IFLE <<Q>-^O377>,<
+		^O161
+		<Q>>>
+
+DEFINE AND (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O045
+			<A>>
+		IFG <<A>-^O377>,<
+			^O055
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				^O065
+				<A>>
+			IFG <<A>-^O377>,<
+				^O075
+				<A>&^O377
+				<A>/^O400>>
+		IFIDN <B> <Y>,<
+			^O071
+			<A>&^O377
+			<A>/^O400>>>
+
+DEFINE ANDDY (Q),<
+	IFLE <<Q>-^O377>,<
+		^O061
+		<Q>>>
+
+DEFINE ASL (Q,B),<
+	IFDIF <Q> <A>,<
+		IFB <B>,<
+			IFLE <<Q>-^O377>,<
+				^O006
+				<Q>>
+			IFG <<Q>-^O377>,<
+				^O016
+				<Q>&^O377
+				<Q>/^O400>>
+		IFNB <B>,<
+			IFIDN <B> <X>,<
+				IFLE <<Q>-^O377>,<
+					^O026
+					<Q>>
+				IFG <<Q>-^O377>,<
+					^O036
+					<Q>&^O377
+					<Q>/^O400>>>>
+	IFIDN <Q> <A>,<
+		^O012>>
+
+DEFINE LSR (Q,B),<
+	IFDIF <Q> <A>,<
+		IFB <B>,<
+			IFLE <<Q>-^O377>,<
+				^O106
+				<Q>>
+			IFG <<Q>-^O377>,<
+				^O116
+				<Q>&^O377
+				<Q>/^O400>>
+		IFNB <B>,<
+			IFIDN <B> <X>,<
+				IFLE <<Q>-^O377>,<
+					^O126
+					<Q>>
+				IFG <<Q>-^O377>,<
+					^O136
+					<Q>&^O377
+					<Q>/^O400>>>>
+	IFIDN <Q> <A>,<
+		^O112>>
+
+DEFINE ROL (Q,B),<
+	IFDIF <Q> <A>,<
+		IFB <B>,<
+			IFLE <<Q>-^O377>,<
+				^O046
+				<Q>>
+			IFG <<Q>-^O377>,<
+				^O056
+				<Q>&^O377
+				<Q>/^O400>>
+		IFNB <B>,<
+			IFIDN <B> <X>,<
+				IFLE <<Q>-^O377>,<
+					^O066
+					<Q>>
+				IFG <<Q>-^O377>,<
+					^O076
+					<Q>&^O377
+					<Q>/^O400>>>>
+	IFIDN <Q> <A>,<
+		^O052>>
+
+DEFINE ROR (Q,B),<
+	IFDIF <Q> <A>,<
+		IFB <B>,<
+			IFLE <<Q>-^O377>,<
+				^O146
+				<Q>>
+			IFG <<Q>-^O377>,<
+				^O156
+				<Q>&^O377
+				<Q>/^O400>>
+		IFNB <B>,<
+			IFIDN <B> <X>,<
+				IFLE <<Q>-^O377>,<
+					^O166
+					<Q>>
+				IFG <<Q>-^O377>,<
+					^O176
+					<Q>&^O377
+					<Q>/^O400>>>>
+	IFIDN <Q> <A>,<
+		^O152>>
+
+DEFINE SBC (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O345
+			<A>>
+		IFG <<A>-^O377>,<
+			^O355
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				^O365
+				<A>>
+			IFG <<A>-^O377>,<
+				^O375
+				<A>&^O377
+				<A>/^O400>>
+		IFIDN <B> <Y>,<
+			^O371
+			<A>&^O377
+			<A>/^O400>>>
+
+DEFINE SBCDY (Q),<
+	IFLE <<Q>-^O377>,<
+		^O361
+		<Q>>>
+
+DEFINE CMP (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O305
+			<A>>
+		IFG <<A>-^O377>,<
+			^O315
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				^O325
+				<A>>
+			IFG <<A>-^O377>,<
+				^O335
+				<A>&^O377
+				<A>/^O400>>
+		IFIDN <B> <Y>,<
+			^O331
+			<A>&^O377
+			<A>/^O400>>>
+
+DEFINE CMPDY (Q),<
+	IFLE <<Q>-^O377>,<
+		^O321
+		<Q>>>
+
+DEFINE CPX (Q),<
+	IFLE <<Q>-^O377>,<
+		^O344
+		<Q>>
+	IFG <<Q>-^O377>,<
+		^O354
+		<Q>&^O377
+		<Q>/^O400>>
+
+DEFINE CPY (Q),<
+	IFLE <<Q>-^O377>,<
+		^O304
+		<Q>>
+	IFG <<Q>-^O377>,<
+		^O314
+		<Q>&^O377
+		<Q>/^O400>>
+
+DEFINE EOR (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O105
+			<A>>
+		IFG <<A>-^O377>,<
+			^O115
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				^O125
+				<A>>
+			IFG <<A>-^O377>,<
+				^O135
+				<A>&^O377
+				<A>/^O400>>
+		IFIDN <B> <Y>,<
+			^O131
+			<A>&^O377
+			<A>/^O400>>>
+
+DEFINE EORDY (Q),<
+	IFLE <<Q>-^O377>,<
+		^O121
+		<Q>>>
+
+DEFINE ORA (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O005
+			<A>>
+		IFG <<A>-^O377>,<
+			^O015
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				^O025
+				<A>>
+			IFG <<A>-^O377>,<
+				^O035
+				<A>&^O377
+				<A>/^O400>>
+		IFIDN <B> <Y>,<
+			^O031
+			<A>&^O377
+			<A>/^O400>>>
+
+DEFINE ORADY (Q),<
+	IFLE <<Q>-^O377>,<
+		^O021
+		<Q>>>
+
+DEFINE DEC (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O306
+			<A>>
+		IFG <<A>-^O377>,<
+			^O316
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				^O326
+				<A>>
+			IFG <<A>-^O377>,<
+				^O336
+				<A>&^O377
+				<A>/^O400>>>>
+
+DEFINE INC (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O346
+			<A>>
+		IFG <<A>-^O377>,<
+			^O356
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				^O366
+				<A>>
+			IFG <<A>-^O377>,<
+				^O376
+				<A>&^O377
+				<A>/^O400>>>>
+
+DEFINE LDA (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O245
+			<A>>
+		IFG <<A>-^O377>,<
+			^O255
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				^O265
+				<A>>
+			IFG <<A>-^O377>,<
+				^O275
+				<A>&^O377
+				<A>/^O400>>
+		IFIDN <B> <Y>,<
+			^O271
+			<A>&^O377
+			<A>/^O400>>>
+
+DEFINE LDADY (Q),<
+	IFLE <<Q>-^O377>,<
+		^O261
+		<Q>>>
+
+DEFINE LDX (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O246
+			<A>>
+		IFG <<A>-^O377>,<
+			^O256
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <Y>,<
+			IFLE <<A>-^O377>,<
+				^O266
+				<A>>
+			IFG <<A>-^O377>,<
+				^O276
+				<A>&^O377
+				<A>/^O400>>>>
+
+DEFINE LDY (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O244
+			<A>>
+		IFG <<A>-^O377>,<
+			^O254
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				^O264
+				<A>>
+			IFG <<A>-^O377>,<
+				^O274
+				<A>&^O377
+				<A>/^O400>>>>
+
+DEFINE STA (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O205
+			<A>>
+		IFG <<A>-^O377>,<
+			^O215
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				^O225
+				<A>>
+			IFG <<A>-^O377>,<
+				^O235
+				<A>&^O377
+				<A>/^O400>>
+		IFIDN <B> <Y>,<
+			^O231
+			<A>&^O377
+			<A>/^O400>>>
+
+DEFINE STADY (Q),<
+	IFLE <<Q>-^O377>,<
+		^O221
+		<Q>>>
+
+DEFINE STX (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O206
+			<A>>
+		IFG <<A>-^O377>,<
+			^O216
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <Y>,<
+			IFLE <<A>-^O377>,<
+				^O226
+				<A>>>>>
+
+DEFINE STY (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			^O204
+			<A>>
+		IFG <<A>-^O377>,<
+			^O214
+			<A>&^O377
+			<A>/^O400>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				^O224
+				<A>>>>>
+
+DEFINE BCC (Q),<
+	IF1, <
+		NOP
+		NOP>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				^O220
+				<BB>>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				^O220
+				<BB>>>>>
+
+DEFINE BCS (Q),<
+	IF1, <
+		NOP
+		NOP>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				^O260
+				<BB>>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				^O260
+				<BB>>>>>
+
+DEFINE BEQ (Q),<
+	IF1, <
+		NOP
+		NOP>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				^O360
+				<BB>>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				^O360
+				<BB>>>>>
+
+DEFINE BMI (Q),<
+	IF1, <
+		NOP
+		NOP>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				^O060
+				<BB>>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				^O060
+				<BB>>>>>
+
+DEFINE BNE (Q),<
+	IF1, <
+		NOP
+		NOP>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				^O320
+				<BB>>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				^O320
+				<BB>>>>>
+
+DEFINE BPL (Q),<
+	IF1, <
+		NOP
+		NOP>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				^O020
+				<BB>>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				^O020
+				<BB>>>>>
+
+DEFINE BVC (Q),<
+	IF1, <
+		NOP
+		NOP>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				^O120
+				<BB>>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				^O120
+				<BB>>>>>
+
+DEFINE BVS (Q),<
+	IF1, <
+		NOP
+		NOP>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				^O160
+				<BB>>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				^O160
+				<BB>>>>>
+
+DEFINE LDAI (Q),<
+	^O251
+	<Q>&^O377>
+DEFINE LDYI (Q),<
+	^O240
+	<Q>&^O377>
+DEFINE LDXI (Q),<
+	^O242
+	<Q>&^O377>
+DEFINE CMPI (Q),<
+	^O311
+	<Q>&^O377>
+DEFINE CPXI (Q),<
+	^O340
+	<Q>&^O377>
+DEFINE CPYI (Q),<
+	^O300
+	<Q>&^O377>
+DEFINE SBCI (Q),<
+	^O351
+	<Q>&^O377>
+DEFINE ADCI (Q),<
+	^O151
+	<Q>&^O377>
+DEFINE ANDI (Q),<
+	^O051
+	<Q>&^O377>
+DEFINE EORI (Q),<
+	^O111
+	<Q>&^O377>
+DEFINE ORAI (Q),<
+	^O011
+	<Q>&^O377>
+
+DEFINE PHA,<
+	^O110>
+DEFINE PLA,<
+	^O150>
+DEFINE PHP,<
+	^O010>
+DEFINE PLP,<
+	^O050>
+DEFINE TAX,<
+	^O252>
+DEFINE TXA,<
+	^O212>
+DEFINE TAY,<
+	^O250>
+DEFINE TYA,<
+	^O230>
+DEFINE TSX,<
+	^O272>
+DEFINE TXS,<
+	^O232>
+DEFINE RTS,<
+	^O140>
+DEFINE NOP,<
+	^O352>
+DEFINE CLC,<
+	^O030>
+DEFINE CLD,<
+	^O330>
+DEFINE CLI,<
+	^O130>
+DEFINE CLV,<
+	^O270>
+DEFINE SEC,<
+	^O070>
+DEFINE SED,<
+	^O370>
+DEFINE SEI,<
+	^O170>
+DEFINE INX,<
+	^O350>
+DEFINE INY,<
+	^O310>
+DEFINE DEX,<
+	^O312>
+DEFINE DEY,<
+	^O210>
+
+	END	START

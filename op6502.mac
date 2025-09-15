@@ -1,0 +1,556 @@
+UNIVERSAL M6502
+SALL
+
+;
+; WRITTEN BY:
+;
+; SCOTT LABOMBARD
+; LABOMB@ROCHESTER.RR.COM
+; 01/06/2014
+;
+
+START:
+
+DEFINE ORG (Q),<
+	LOC <Q>
+	RIM10>
+
+;X=NUMBER OF INSTRUCTION BYTES
+;Y=INSTRUCTION OPCODE
+;Z=INSTRUCTION OPERAND
+;
+DEFINE DOCOD (X,Y,Z),<
+	IFLE <.-^O400>,<
+		N==^O7000>
+	IFG <.-^O400>,<
+		N==^O1000>
+	XWD N,<Y>
+	IFE <<X>-2>,<
+		XWD N,<Z>>
+	IFE <<X>-3>,<
+		XWD N,<Z>&^O377
+		XWD N,<Z>/^O400>>
+
+DEFINE DC (Q),<
+	N==0
+	IRPC Q,<N==N+1>
+	BB==<N-1>
+	IRPC Q,<
+		BB==<BB-1>
+		IFN "Q",<
+			IFE <BB>,<
+				DOCOD(1,"Q"+^O200)>
+			IFN <BB>,<
+				DOCOD(1,"Q")>>>>
+
+DEFINE ADR (WD),<
+	DOCOD(2,<<WD>&^O377>,<<WD>/^O400>)>
+
+DEFINE JSR (WD),<
+	DOCOD(3,^O040,<WD>)>
+
+DEFINE JMP (WD),<
+	DOCOD(3,^O114,<WD>)>
+
+DEFINE JMPD (WD),<
+	DOCOD(3,^O154,<WD>)>
+
+DEFINE BIT (Q),<
+	IFLE <<Q>-^O377>,<
+		DOCOD(2,^O044,<Q>)>
+	IFG <<Q>-^O377>,<
+		DOCOD(3,^O054,<Q>)>>
+
+DEFINE ADC (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O145,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O155,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O165,<A>)>
+			IFG <<A>-^O377>,<
+				DOCOD(3,^O175,<A>)>>
+		IFIDN <B> <Y>,<
+			DOCOD(3,^O171,<A>)>>>
+
+DEFINE ADCDY (Q),<
+	IFLE <<Q>-^O377>,<
+		DOCOD(2,^O161,<Q>)>>
+
+DEFINE AND (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O045,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O055,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O065,<A>)>
+			IFG <<A>-^O377>,<
+				DOCOD(3,^O075,<A>)>>
+		IFIDN <B> <Y>,<
+			DOCOD(3,^O071,<A>)>>>
+
+DEFINE ANDDY (Q),<
+	IFLE <<Q>-^O377>,<
+		DOCOD(2,^O061,<Q>)>>
+
+DEFINE ASL (Q,B),<
+	IFDIF <Q> <A>,<
+		IFB <B>,<
+			IFLE <<Q>-^O377>,<
+				DOCOD(2,^O006,<Q>)>
+			IFG <<Q>-^O377>,<
+				DOCOD(3,^O016,<Q>)>>
+		IFNB <B>,<
+			IFIDN <B> <X>,<
+				IFLE <<Q>-^O377>,<
+					DOCOD(2,^O026,<Q>)>
+				IFG <<Q>-^O377>,<
+					DOCOD(3,^O036,<Q>)>>>>
+	IFIDN <Q> <A>,<
+		DOCOD(1,^O012)>>
+
+DEFINE LSR (Q,B),<
+	IFDIF <Q> <A>,<
+		IFB <B>,<
+			IFLE <<Q>-^O377>,<
+				DOCOD(2,^O106,<Q>)>
+			IFG <<Q>-^O377>,<
+				DOCOD(3,^O116,<Q>)>>
+		IFNB <B>,<
+			IFIDN <B> <X>,<
+				IFLE <<Q>-^O377>,<
+					DOCOD(2,^O126,<Q>)>
+				IFG <<Q>-^O377>,<
+					DOCOD(3,^O136,<Q>)>>>>
+	IFIDN <Q> <A>,<
+		DOCOD(1,^O112)>>
+
+DEFINE ROL (Q,B),<
+	IFDIF <Q> <A>,<
+		IFB <B>,<
+			IFLE <<Q>-^O377>,<
+				DOCOD(2,^O046,<Q>)>
+			IFG <<Q>-^O377>,<
+				DOCOD(3,^O056,<Q>)>>
+		IFNB <B>,<
+			IFIDN <B> <X>,<
+				IFLE <<Q>-^O377>,<
+					DOCOD(2,^O066,<Q>)>
+				IFG <<Q>-^O377>,<
+					DOCOD(3,^O076,<Q>)>>>>
+	IFIDN <Q> <A>,<
+		DOCOD(1,^O052)>>
+
+DEFINE ROR (Q,B),<
+	IFDIF <Q> <A>,<
+		IFB <B>,<
+			IFLE <<Q>-^O377>,<
+				DOCOD(2,^O146,<Q>)>
+			IFG <<Q>-^O377>,<
+				DOCOD(3,^O156,<Q>)>>
+		IFNB <B>,<
+			IFIDN <B> <X>,<
+				IFLE <<Q>-^O377>,<
+					DOCOD(2,^O166,<Q>)>
+				IFG <<Q>-^O377>,<
+					DOCOD(3,^O176,<Q>)>>>>
+	IFIDN <Q> <A>,<
+		DOCOD(1,^O152)>>
+
+DEFINE SBC (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O345,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O355,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O365,<A>)>
+			IFG <<A>-^O377>,<
+				DOCOD(3,^O375,<A>)>>
+		IFIDN <B> <Y>,<
+			DOCOD(3,^O371,<A>)>>>
+
+DEFINE SBCDY (Q),<
+	IFLE <<Q>-^O377>,<
+		DOCOD(2,^O361,<Q>)>>
+
+DEFINE CMP (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O305,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O315,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O325,<A>)>
+			IFG <<A>-^O377>,<
+				DOCOD(3,^O335,<A>)>>
+		IFIDN <B> <Y>,<
+			DOCOD(3,^O331,<A>)>>>
+
+DEFINE CMPDY (Q),<
+	IFLE <<Q>-^O377>,<
+		DOCOD(2,^O321,<Q>)>>
+
+DEFINE CPX (Q),<
+	IFLE <<Q>-^O377>,<
+		DOCOD(2,^O344,<Q>)>
+	IFG <<Q>-^O377>,<
+		DOCOD(3,^O354,<Q>)>>
+
+DEFINE CPY (Q),<
+	IFLE <<Q>-^O377>,<
+		DOCOD(2,^O304,<Q>)>
+	IFG <<Q>-^O377>,<
+		DOCOD(3,^O314,<Q>)>>
+
+DEFINE EOR (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O105,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O115,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O125,<A>)>
+			IFG <<A>-^O377>,<
+				DOCOD(3,^O135,<A>)>>
+		IFIDN <B> <Y>,<
+			DOCOD(3,^O131,<A>)>>>
+
+DEFINE EORDY (Q),<
+	IFLE <<Q>-^O377>,<
+		DOCOD(2,^O121,<Q>)>>
+
+DEFINE ORA (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O005,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O015,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O025,<A>)>
+			IFG <<A>-^O377>,<
+				DOCOD(3,^O035,<A>)>>
+		IFIDN <B> <Y>,<
+			DOCOD(3,^O031,<A>)>>>
+
+DEFINE ORADY (Q),<
+	IFLE <<Q>-^O377>,<
+		DOCOD(2,^O021,<Q>)>>
+
+DEFINE DEC (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O306,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O316,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O326,<A>)>
+			IFG <<A>-^O377>,<
+				DOCOD(3,^O336,<A>)>>>>
+
+DEFINE INC (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O346,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O356,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O366,<A>)>
+			IFG <<A>-^O377>,<
+				DOCOD(3,^O376,<A>)>>>>
+
+DEFINE LDA (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O245,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O255,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O265,<A>)>
+			IFG <<A>-^O377>,<
+				DOCOD(3,^O275,<A>)>>
+		IFIDN <B> <Y>,<
+			DOCOD(3,^O271,<A>)>>>
+
+DEFINE LDADY (Q),<
+	IFLE <<Q>-^O377>,<
+		DOCOD(2,^O261,<Q>)>>
+
+DEFINE LDX (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O246,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O256,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <Y>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O266,<A>)>
+			IFG <<A>-^O377>,<
+				DOCOD(3,^O276,<A>)>>>>
+
+DEFINE LDY (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O244,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O254,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O264,<A>)>
+			IFG <<A>-^O377>,<
+				DOCOD(3,^O274,<A>)>>>>
+
+DEFINE STA (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O205,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O215,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O225,<A>)>
+			IFG <<A>-^O377>,<
+				DOCOD(3,^O235,<A>)>>
+		IFIDN <B> <Y>,<
+			DOCOD(3,^O231,<A>)>>>
+
+DEFINE STADY (Q),<
+	IFLE <<Q>-^O377>,<
+		DOCOD(2,^O221,<Q>)>>
+
+DEFINE STX (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O206,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O216,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <Y>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O226,<A>)>>>>
+
+DEFINE STY (A,B),<
+	IFB <B>,<
+		IFLE <<A>-^O377>,<
+			DOCOD(2,^O204,<A>)>
+		IFG <<A>-^O377>,<
+			DOCOD(3,^O214,<A>)>>
+	IFNB <B>,<
+		IFIDN <B> <X>,<
+			IFLE <<A>-^O377>,<
+				DOCOD(2,^O224,<A>)>>>>
+
+DEFINE BCC (Q),<
+	IF1, <
+		DOCOD(2,0,0)>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				DOCOD(2,^O220,<BB>)>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				DOCOD(2,^O220,<BB>)>>>>
+
+DEFINE BCS (Q),<
+	IF1, <
+		DOCOD(2,0,0)>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				DOCOD(2,^O260,<BB>)>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				DOCOD(2,^O260,<BB>)>>>>
+
+DEFINE BEQ (Q),<
+	IF1, <
+		DOCOD(2,0,0)>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				DOCOD(2,^O360,<BB>)>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				DOCOD(2,^O360,<BB>)>>>>
+
+DEFINE BMI (Q),<
+	IF1, <
+		DOCOD(2,0,0)>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				DOCOD(2,^O060,<BB>)>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				DOCOD(2,^O060,<BB>)>>>>
+
+DEFINE BNE (Q),<
+	IF1, <
+		DOCOD(2,0,0)>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				DOCOD(2,^O320,<BB>)>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				DOCOD(2,^O320,<BB>)>>>>
+
+DEFINE BPL (Q),<
+	IF1, <
+		DOCOD(2,0,0)>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				DOCOD(2,^O020,<BB>)>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				DOCOD(2,^O020,<BB>)>>>>
+
+DEFINE BVC (Q),<
+	IF1, <
+		DOCOD(2,0,0)>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				DOCOD(2,^O120,<BB>)>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				DOCOD(2,^O120,<BB>)>>>>
+
+DEFINE BVS (Q),<
+	IF1, <
+		DOCOD(2,0,0)>
+	IF2, <
+		FWD==0
+		IFGE <<Q>-<.+2>>,<
+			FWD==1>
+		BB==<<<Q>-<.+2>>&^O377>
+		IFN <FWD>,<
+			IFLE <BB-^D127>,<
+				DOCOD(2,^O160,<BB>)>>
+		IFE <FWD>,<
+			IFGE <BB-^D128>,<
+				DOCOD(2,^O160,<BB>)>>>>
+
+DEFINE LDAI (Q),<
+	DOCOD(2,^O251,<<Q>&^O377>)>
+DEFINE LDYI (Q),<
+	DOCOD(2,^O240,<<Q>&^O377>)>
+DEFINE LDXI (Q),<
+	DOCOD(2,^O242,<<Q>&^O377>)>
+DEFINE CMPI (Q),<
+	DOCOD(2,^O311,<<Q>&^O377>)>
+DEFINE CPXI (Q),<
+	DOCOD(2,^O340,<<Q>&^O377>)>
+DEFINE CPYI (Q),<
+	DOCOD(2,^O300,<<Q>&^O377>)>
+DEFINE SBCI (Q),<
+	DOCOD(2,^O351,<<Q>&^O377>)>
+DEFINE ADCI (Q),<
+	DOCOD(2,^O151,<<Q>&^O377>)>
+DEFINE ANDI (Q),<
+	DOCOD(2,^O051,<<Q>&^O377>)>
+DEFINE EORI (Q),<
+	DOCOD(2,^O111,<<Q>&^O377>)>
+DEFINE ORAI (Q),<
+	DOCOD(2,^O011,<<Q>&^O377>)>
+
+DEFINE PHA,<
+	DOCOD(1,^O110)>
+DEFINE PLA,<
+	DOCOD(1,^O150)>
+DEFINE PHP,<
+	DOCOD(1,^O010)>
+DEFINE PLP,<
+	DOCOD(1,^O050)>
+DEFINE TAX,<
+	DOCOD(1,^O252)>
+DEFINE TXA,<
+	DOCOD(1,^O212)>
+DEFINE TAY,<
+	DOCOD(1,^O250)>
+DEFINE TYA,<
+	DOCOD(1,^O230)>
+DEFINE TSX,<
+	DOCOD(1,^O272)>
+DEFINE TXS,<
+	DOCOD(1,^O232)>
+DEFINE RTS,<
+	DOCOD(1,^O140)>
+DEFINE NOP,<
+	DOCOD(1,^O352)>
+DEFINE CLC,<
+	DOCOD(1,^O030)>
+DEFINE CLD,<
+	DOCOD(1,^O330)>
+DEFINE CLI,<
+	DOCOD(1,^O130)>
+DEFINE CLV,<
+	DOCOD(1,^O270)>
+DEFINE SEC,<
+	DOCOD(1,^O070)>
+DEFINE SED,<
+	DOCOD(1,^O370)>
+DEFINE SEI,<
+	DOCOD(1,^O170)>
+DEFINE INX,<
+	DOCOD(1,^O350)>
+DEFINE INY,<
+	DOCOD(1,^O310)>
+DEFINE DEX,<
+	DOCOD(1,^O312)>
+DEFINE DEY,<
+	DOCOD(1,^O210)>
+
+	END	START
